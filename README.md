@@ -83,7 +83,7 @@ You should see a console output with a `ShardId` and a `SequenceNumber`
 
 ### Setting up a Lambda trigger
 
-Whenever there's an update to the kinesis stream, we will trigger a lambda that will take the new request and offloads it onto our `inference server`. Make sure the `lambda_trigger.py` file is present in your working directory and run:
+Whenever there's an update to the kinesis stream, we will trigger a lambda that will take the new request and offloads it onto our `inference server`. Make sure the `trigger_lambda.py` file is present in your working directory and run:
 
 ```
 mkdir lambda_trigger_package
