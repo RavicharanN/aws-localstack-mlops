@@ -76,7 +76,7 @@ awslocal kinesis describe-stream --stream-name food11-inference-stream
 Send a dummy test event to the kinesis stream. The `partition-key = 1` is a simple static partition key that we will use for demo purposes
 
 ```
-awslocal kinesis put-record --stream-name food11-inference-stream --partition-key "1" --data "Test event for food11 inference"
+awslocal kinesis put-record --stream-name food11-inference-stream --partition-key "1" --data "s3://test-images/0.jpg"
 ```
 
 You should see a console output with a `ShardId` and a `SequenceNumber`
