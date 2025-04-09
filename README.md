@@ -53,6 +53,14 @@ Verify if the policy is put in place
 awslocal s3api get-bucket-policy --bucket food11-classifier
 ```
 
+### Upload the testset onto  S3 
+
+Create bucket named `test-images` and upload the testset (used for demo) from the current directory to S3 
+```
+awslocal s3 mb s3://test-images
+awslocal s3 cp test-images/ s3://test-images/ --recursive
+```
+
 ### Create a Kinesis stream 
 
 We will use a kinesis stream to ingest inference requests onto our pipeline. A lambda will poll from this and run the inference on the incoming reuqwests in the stream. Lets create a single instance of a kinesis stream
@@ -72,4 +80,5 @@ awslocal kinesis put-record --stream-name food11-inference-stream --partition-ke
 ```
 
 You should see a console output with a `ShardId` and a `SequenceNumber`
+
 
