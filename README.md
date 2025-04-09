@@ -53,3 +53,23 @@ Verify if the policy is put in place
 awslocal s3api get-bucket-policy --bucket food11-classifier
 ```
 
+### Create a Kinesis stream 
+
+We will use a kinesis stream to ingest inference requests onto our pipeline. A lambda will poll from this and run the inference on the incoming reuqwests in the stream. Lets create a single instance of a kinesis stream
+```
+awslocal kinesis create-stream --stream-name food11-inference-stream --shard-count 1
+```
+To verify, run: 
+
+```
+awslocal kinesis describe-stream --stream-name food11-inference-stream
+```
+
+Send a dummy test event to the kinesis stream. The `partition-key = 1` is a simple static partition key that we will use for demo purposes
+
+```
+awslocal kinesis put-record --stream-name food11-inference-stream --partition-key "1" --data "Test event for food11 inference"
+```
+
+You should see a console output with a `ShardId` and a `SequenceNumber`
+
