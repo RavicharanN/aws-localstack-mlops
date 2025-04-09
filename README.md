@@ -41,8 +41,7 @@ Check if the model has been successfully uploaded
 
 ### (Optional) Create Dummy policy on S3 
 
-We will create a demo policy that allows public readwrite to S3 is defined at `s3_bucket_policy.json`. This doesn't have any effect on the access when localstack community edition and is just a demonstration of how access is potentially controlled on production. You can skip this seciton
-
+We will create a demo policy that allows public readwrite to S3 is defined at `s3_bucket_policy.json`. This doesn't have any effect on the access when localstack community edition and is just a demonstration of how access is potentially controlled on production. 
 Create a policy
 ```
 awslocal s3api put-bucket-policy --bucket food11-classifier --policy file://s3_bucket_policy.json
