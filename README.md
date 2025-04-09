@@ -16,7 +16,7 @@ docker run --rm -it -p 4566:4566 -p 4571:4571 localstack/localstack
 
 ### Create an S3 bucket and load the model
 
-Set env vars (ToDO; move to source)
+Set env vars (ToDO; move to `~/.aws/credentials`)
 ```
 export AWS_ACCESS_KEY_ID=test
 export AWS_SECRET_ACCESS_KEY=test
