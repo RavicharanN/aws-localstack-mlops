@@ -31,7 +31,7 @@ Create a food11classifier bucket and upload the `model.pth` onto the bucket
 ```
 awslocal s3 mb s3://food11-classifier
 
-awslocal s3 cp model.pth s3://food11-classifier/model.pth
+awslocal s3 cp food11.pth s3://food11-classifier/food11.pth
 ```
 
 Check if the model has been successfully uploaded
