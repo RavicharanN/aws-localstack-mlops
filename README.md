@@ -49,7 +49,7 @@ Create a policy
 awslocal s3api put-bucket-policy --bucket food11-classifier --policy file://s3_bucket_policy.json
 ```
 
-Verify if the policy is put in place 
+Verify if the policy is in place 
 ```
 awslocal s3api get-bucket-policy --bucket food11-classifier
 ```
