@@ -81,7 +81,7 @@ awslocal kinesis put-record --stream-name food11-inference-stream --partition-ke
 
 You should see a console output with a `ShardId` and a `SequenceNumber`
 
-### Setting up a lambda trigger
+### Setting up a Lambda trigger
 
 Whenever there's an update to the kinesis stream, we will trigger a lambda that will take the new request and offloads it onto our `inference server`. Make sure the `lambda_trigger.py` file is present in your working directory and run:
 
@@ -115,7 +115,7 @@ awslocal lambda get-function --function-name food11-trigger-lambda
 
 You should see a `Status: Active` and the configurations you previusly set in the console output. 
 
-### Map lambda to kinesis
+### Map Lambda to kinesis
 
 Now that we setup our lambda trigger, we need to make it to our kinesis stream. Create an event source mapping from your Kinesis stream (e.g., food11-inference-stream) to trigger this Lambda by running:
 
