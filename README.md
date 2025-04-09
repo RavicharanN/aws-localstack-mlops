@@ -81,4 +81,73 @@ awslocal kinesis put-record --stream-name food11-inference-stream --partition-ke
 
 You should see a console output with a `ShardId` and a `SequenceNumber`
 
+### Setting up a lambda trigger
+
+Whenever there's an update to the kinesis stream, we will trigger a lambda that will take the new request and offloads it onto our `inference server`. Make sure the `lambda_trigger.py` file is present in your working directory and run:
+
+```
+mkdir lambda_trigger_package
+cp trigger_lambda.py lambda_trigger_package/
+pip install requests -t lambda_trigger_package/
+cd lambda_trigger_package
+zip -r ../trigger_lambda.zip .
+cd ..
+``` 
+
+Create a lambda function 
+
+```
+awslocal lambda create-function \
+  --function-name food11-trigger-lambda \
+  --runtime python3.11 \
+  --handler trigger_lambda.lambda_handler \
+  --memory-size 128 \
+  --timeout 30 \
+  --zip-file fileb://trigger_lambda.zip \
+  --role arn:aws:iam::000000000000:role/lambda-role
+```
+
+To verify is your lambda is created correctly run:
+
+```
+awslocal lambda get-function --function-name food11-trigger-lambda
+```
+
+You should see a `Status: Active` and the configurations you previusly set in the console output. 
+
+### Map lambda to kinesis
+
+Now that we setup our lambda trigger, we need to make it to our kinesis stream. Create an event source mapping from your Kinesis stream (e.g., food11-inference-stream) to trigger this Lambda by running:
+
+```
+awslocal lambda create-event-source-mapping \
+  --function-name food11-trigger-lambda \
+  --batch-size 1 \
+  --starting-position LATEST \
+  --event-source-arn arn:aws:kinesis:us-east-1:000000000000:stream/food11-inference-stream
+```
+
+Now lets push a dummy event to kinesis to see if the trigger is working as expected. First we encode a valid image path on S3 to base64 and publish it as an event to kinesis 
+
+```
+echo -n "s3://test-images/your_image.jpg" | base64
+```
+
+Copy the result of this base64 to your clipboard then run:
+
+```
+awslocal kinesis put-record \
+  --stream-name food11-inference-stream \
+  --partition-key "1" \
+  --data "czM6Ly90ZXN0LWltYWdlcy95b3VyX2ltYWdlLmpwZw=="
+```
+
+The docker logs should show if the lambda trigger is working as expected when an event is pushed into the stream:
+
+```
+2025-04-09T16:35:40.946  INFO --- [et.reactor-0] localstack.request.aws     : AWS kinesis.PutRecord => 200
+2025-04-09T16:36:20.866  INFO --- [et.reactor-0] localstack.request.http    : POST /_localstack_lambda/f0551557c97966a9bf4b5f1b62b29653/status/f0551557c97966a9bf4b5f1b62b29653/ready => 202
+2025-04-09T16:36:20.877  INFO --- [et.reactor-2] localstack.request.http    : POST /_localstack_lambda/f0551557c97966a9bf4b5f1b62b29653/invocations/20d3ddc4-4dd4-434c-9b6c-9494a26a5dd8/logs => 202
+2025-04-09T16:36:20.879  INFO --- [et.reactor-0] localstack.request.http    : POST /_localstack_lambda/f0551557c97966a9bf4b5f1b62b29653/invocations/20d3ddc4-4dd4-434c-9b6c-9494a26a5dd8/response => 202
+```
 
