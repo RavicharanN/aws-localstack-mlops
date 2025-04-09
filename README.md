@@ -41,7 +41,7 @@ Check if the model has been successfully uploaded
 
 ### (Optional) Create Dummy policy on S3 
 
-This doesn't have any effect on the localstack community edition. A policy that allows public readwrite to S3 is defined at `s3_bucket_policy.json`
+This doesn't have any effect on the access when localstack community edition. But we will create a demo policy that allows public readwrite to S3 is defined at `s3_bucket_policy.json`
 
 Create a policy
 ```
