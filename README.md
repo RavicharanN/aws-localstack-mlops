@@ -169,9 +169,21 @@ docker run --rm -p 8000:8000 \
   -e S3_ENDPOINT_URL="http://host.docker.internal:4566" \
   inference-service
 ```
+Leave this running in a console. 
 
 Test if the inference server is up and running
 
 ```
 curl -X POST "http://localhost:8000/infer" -H "Content-Type: application/json" -d '{"s3_path": "s3://test-images/2.jpg"}'
 ```
+
+Add a record to the kinesis stream that will trigger a lambda inference post a request to EC2
+```
+echo <s3_file_path> | base64
+
+awslocal kinesis put-record \
+  --stream-name food11-inference-stream \
+  --partition-key "1" \
+  --data "<your_s3_base64>"
+```
+
