@@ -152,3 +152,21 @@ The docker logs should show if the lambda trigger is working as expected when an
 2025-04-09T16:36:20.879  INFO --- [et.reactor-0] localstack.request.http    : POST /_localstack_lambda/f0551557c97966a9bf4b5f1b62b29653/invocations/20d3ddc4-4dd4-434c-9b6c-9494a26a5dd8/response => 202
 ```
 
+### Simulating an EC2 instance (inference server)
+
+In the localstack community edition, the EC2 instance works equaivalent to just deploying a docker container. We will run a flask app in a docker container on localhost. On a production env the URL in the lambda trigger will just be replaced by the apprpriate URI
+
+```
+docker build -t inference-service .
+
+docker run --rm -p 8000:8000 \
+  --add-host=host.docker.internal:host-gateway \
+  -e S3_ENDPOINT_URL="http://host.docker.internal:4566" \
+  inference-service
+```
+
+Test if the inference server is up and running
+
+```
+curl -X POST "http://localhost:8000/infer" -H "Content-Type: application/json" -d '{"s3_path": "s3://test-images/2.jpg"}'
+```
