@@ -1,0 +1,24 @@
+# Use an official lightweight Python image.
+FROM python:3.11-slim
+
+# Local stack credentials - will be replaced by your AWS credentials in prod 
+ENV AWS_ACCESS_KEY_ID=test
+ENV AWS_SECRET_ACCESS_KEY=test
+ENV AWS_DEFAULT_REGION=us-east-1
+
+# Set the working directory in the container.
+WORKDIR /app
+
+# Copy the requirements file into the container.
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code and the model file.
+COPY inference_service.py .
+COPY food11.pth .
+
+# Expose port 8000 for Flask.
+EXPOSE 8000
+
+# Run the Flask service.
+CMD ["python", "inference_service.py"]
