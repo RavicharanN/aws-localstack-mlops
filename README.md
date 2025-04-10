@@ -11,7 +11,12 @@ docker pull localstack/localstack
 
 Run LocalStack as a container
 ```
-docker run --rm -it -p 4566:4566 -p 4571:4571 -v /var/run/docker.sock:/var/run/docker.sock localstack/localstack
+docker run --rm -it -p 4566:4566 -p 4571:4571 \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  --add-host=host.docker.internal:host-gateway \
+  -e AWS_ACCESS_KEY_ID=test \
+  -e export AWS_SECRET_ACCESS_KEY=test
+  localstack/localstack
 ```
 
 ### Create an S3 bucket and load the model
