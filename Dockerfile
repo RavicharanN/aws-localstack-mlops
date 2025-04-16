@@ -1,10 +1,17 @@
 # Use an official lightweight Python image.
 FROM python:3.11-slim
 
-# Local stack credentials - will be replaced by your AWS credentials in prod 
+# AWS credentials (used here for LocalStack; override in production if needed).
 ENV AWS_ACCESS_KEY_ID=test
 ENV AWS_SECRET_ACCESS_KEY=test
 ENV AWS_DEFAULT_REGION=us-east-1
+
+# LocalStack endpoints and resource configuration.
+ENV S3_ENDPOINT_URL=http://host.docker.internal:4566
+ENV KINESIS_ENDPOINT_URL=http://host.docker.internal:4566
+ENV KINESIS_STREAM_NAME=food11-inference-stream
+ENV DYNAMODB_ENDPOINT_URL=http://host.docker.internal:4566
+ENV DYNAMODB_TABLE=InferenceResults
 
 # Set the working directory in the container.
 WORKDIR /app
