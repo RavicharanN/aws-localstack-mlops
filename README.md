@@ -109,23 +109,16 @@ INFO:__main__:Inference result: {'confidence': 0.9677120447158813, 'predicted_cl
 'Bread', 's3_path': 's3://test-images/2.jpg', 'timestamp': '2025-04-16T00:02:31.478226Z'}
 ```
 
+To test the inference server individually run: 
 
 ```
 curl -X POST "http://localhost:8000/infer" -H "Content-Type: application/json" -d '{"s3_path": "s3://test-images/2.jpg"}'
 ```
 
-Add a record to the kinesis stream that will trigger a lambda inference post a request to EC2
-```
-echo <s3_file_path> | base64
-
-awslocal kinesis put-record \
-  --stream-name food11-inference-stream \
-  --partition-key "1" \
-  --data "<your_s3_base64>"
-```
+However when the inference requests are sporadic running an EC2 instance might too expensive to always keep running it. 
 
 
-### Setting up a Lambda trigger
+## Running an inference - Lambda
 
 Whenever there's an update to the kinesis stream, we will trigger a lambda that will take the new request and offloads it onto our `inference server`. Make sure the `trigger_lambda.py` file is present in your working directory and run:
 
