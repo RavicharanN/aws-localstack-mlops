@@ -16,9 +16,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code and the model file.
 COPY inference_service.py .
 COPY food11.pth .
+COPY consumer.py .
 
 # Expose port 8000 for Flask.
 EXPOSE 8000
 
 # Run the Flask service.
-CMD ["python", "inference_service.py"]
+#CMD ["python", "inference_service.py"]
+CMD ["bash", "-c", "python inference_service.py & python consumer.py"]

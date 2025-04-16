@@ -5,3 +5,4 @@ torchvision==0.20.1+cpu
 numpy
 pillow
 boto3
+requests
