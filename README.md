@@ -87,6 +87,44 @@ awslocal kinesis put-record --stream-name food11-inference-stream --partition-ke
 
 You should see a console output with a `ShardId` and a `SequenceNumber`
 
+## Running Inferenece - EC2
+
+First we spin up an EC2 instance that will run a consumer script that polls the latest events added to the kinesis stream. The inference is offloaded onto our Flask inference server running on port 8000. In the localstack community edition, the EC2 instance works equaivalent to just deploying a docker container. We will run a flask app in a docker container on localhost. 
+
+```
+docker build -t inference-service .
+
+sudo docker run --rm -p 8000:8000 \
+   --add-host=host.docker.internal:host-gateway \
+   -e S3_ENDPOINT_URL="http://host.docker.internal:4566" \
+   -e KINESIS_ENDPOINT_URL="http://host.docker.internal:4566" \
+   -e KINESIS_STREAM_NAME="food11-inference-stream" \
+   inference-service
+```
+Leave this running in a console. 
+
+Push an event into the kinesis stream to verify if the consumer polls from our stream. If the consumer picks it up you will see an log like this on the docker container
+```
+INFO:__main__:Inference result: {'confidence': 0.9677120447158813, 'predicted_class': 
+'Bread', 's3_path': 's3://test-images/2.jpg', 'timestamp': '2025-04-16T00:02:31.478226Z'}
+```
+
+
+```
+curl -X POST "http://localhost:8000/infer" -H "Content-Type: application/json" -d '{"s3_path": "s3://test-images/2.jpg"}'
+```
+
+Add a record to the kinesis stream that will trigger a lambda inference post a request to EC2
+```
+echo <s3_file_path> | base64
+
+awslocal kinesis put-record \
+  --stream-name food11-inference-stream \
+  --partition-key "1" \
+  --data "<your_s3_base64>"
+```
+
+
 ### Setting up a Lambda trigger
 
 Whenever there's an update to the kinesis stream, we will trigger a lambda that will take the new request and offloads it onto our `inference server`. Make sure the `trigger_lambda.py` file is present in your working directory and run:
@@ -156,34 +194,3 @@ The docker logs should show if the lambda trigger is working as expected when an
 2025-04-09T16:36:20.877  INFO --- [et.reactor-2] localstack.request.http    : POST /_localstack_lambda/f0551557c97966a9bf4b5f1b62b29653/invocations/20d3ddc4-4dd4-434c-9b6c-9494a26a5dd8/logs => 202
 2025-04-09T16:36:20.879  INFO --- [et.reactor-0] localstack.request.http    : POST /_localstack_lambda/f0551557c97966a9bf4b5f1b62b29653/invocations/20d3ddc4-4dd4-434c-9b6c-9494a26a5dd8/response => 202
 ```
-
-### Simulating an EC2 instance (inference server)
-
-In the localstack community edition, the EC2 instance works equaivalent to just deploying a docker container. We will run a flask app in a docker container on localhost. On a production env the URL in the lambda trigger will just be replaced by the apprpriate URI
-
-```
-docker build -t inference-service .
-
-docker run --rm -p 8000:8000 \
-  --add-host=host.docker.internal:host-gateway \
-  -e S3_ENDPOINT_URL="http://host.docker.internal:4566" \
-  inference-service
-```
-Leave this running in a console. 
-
-Test if the inference server is up and running
-
-```
-curl -X POST "http://localhost:8000/infer" -H "Content-Type: application/json" -d '{"s3_path": "s3://test-images/2.jpg"}'
-```
-
-Add a record to the kinesis stream that will trigger a lambda inference post a request to EC2
-```
-echo <s3_file_path> | base64
-
-awslocal kinesis put-record \
-  --stream-name food11-inference-stream \
-  --partition-key "1" \
-  --data "<your_s3_base64>"
-```
-
