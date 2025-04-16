@@ -156,7 +156,7 @@ TODO
 
 ### Map Lambda to kinesis
 
-Now that we setup our lambda trigger, we need to make it to our kinesis stream. Create an event source mapping from your Kinesis stream (e.g., food11-inference-stream) to trigger this Lambda by running:
+Now that we setup our lambda trigger, we need to map it to our kinesis stream. Create an event source mapping from your Kinesis stream (e.g., food11-inference-stream) to trigger this Lambda by running:
 
 ```
 awslocal lambda create-event-source-mapping \
