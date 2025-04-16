@@ -116,14 +116,14 @@ curl -X POST "http://localhost:8000/infer" -H "Content-Type: application/json" -
 However when the inference requests are sporadic running an EC2 instance might too expensive to always keep running it. 
 
 
-## Running an inference - Lambda
+## Running an inference - Lambda (torch deployment)
 
-Whenever there's an update to the kinesis stream, we will trigger a lambda that will take the new request and offloads it onto our `inference server`. Make sure the `trigger_lambda.py` file is present in your working directory and run:
+Having an EC2 instance running all the time when the when there are no continous stream of requests may not always be a very cost friendly idea. So we will setup a lambda that gets triggered everytime theres a new event on the kinesis stream. For this, Make sure the `inference_lambda.py` file is present in your working directory and run:
 
 ```
 mkdir lambda_trigger_package
-cp trigger_lambda.py lambda_trigger_package/
-pip install requests -t lambda_trigger_package/
+cp inference_lambda.py lambda_trigger_package/
+pip install -r requirements.txt -t lambda_trigger_package/
 cd lambda_trigger_package
 zip -r ../trigger_lambda.zip .
 cd ..
@@ -135,20 +135,24 @@ Create a lambda function
 awslocal lambda create-function \
   --function-name food11-trigger-lambda \
   --runtime python3.11 \
-  --handler trigger_lambda.lambda_handler \
+  --handler inference_lambda.lambda_handler \
   --memory-size 128 \
   --timeout 30 \
   --zip-file fileb://trigger_lambda.zip \
   --role arn:aws:iam::000000000000:role/lambda-role
 ```
 
-To verify is your lambda is created correctly run:
+**!! This should fail !!**
+
+The reason being lambda are usually supported only for lightweight compute and cannot have heavy dependencies like Pytorch. The lambda deployment should fail with: 
 
 ```
-awslocal lambda get-function --function-name food11-trigger-lambda
+An error occurred (RequestEntityTooLargeException) when calling the CreateFunction operation: Zipped size must be smaller than 52428800 bytes
 ```
 
-You should see a `Status: Active` and the configurations you previusly set in the console output. 
+## Running an inference - Lambda (onnx deployment)
+
+TODO
 
 ### Map Lambda to kinesis
 
