@@ -116,7 +116,7 @@ curl -X POST "http://localhost:8000/infer" -H "Content-Type: application/json" -
 However when the inference requests are sporadic running an EC2 instance might too expensive to always keep running it. 
 
 
-## Running an inference - Lambda (torch deployment)
+## Running inference - Lambda (torch deployment)
 
 Having an EC2 instance running all the time when the when there are no continous stream of requests may not always be a very cost friendly idea. So we will setup a lambda that gets triggered everytime theres a new event on the kinesis stream. For this, Make sure the `inference_lambda.py` file is present in your working directory and run:
 
@@ -150,7 +150,7 @@ The reason being lambda are usually supported only for lightweight compute and c
 An error occurred (RequestEntityTooLargeException) when calling the CreateFunction operation: Zipped size must be smaller than 52428800 bytes
 ```
 
-## Running an inference - Lambda (onnx deployment)
+## Running inference - Lambda (onnx deployment)
 
 TODO
 
