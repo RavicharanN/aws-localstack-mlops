@@ -97,9 +97,6 @@ docker build -t inference-service .
 
 sudo docker run --rm -p 8000:8000 \
    --add-host=host.docker.internal:host-gateway \
-   -e S3_ENDPOINT_URL="http://host.docker.internal:4566" \
-   -e KINESIS_ENDPOINT_URL="http://host.docker.internal:4566" \
-   -e KINESIS_STREAM_NAME="food11-inference-stream" \
    inference-service
 ```
 Leave this running in a console. 
