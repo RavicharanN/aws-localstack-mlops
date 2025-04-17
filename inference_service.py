@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Use an environment variable to point to your S3 endpoint.
-s3_endpoint = os.environ.get("S3_ENDPOINT_URL", "http://host.docker.internal:4566")
+s3_endpoint = os.environ.get("LOCALSTACK_ENDPOINT_URL", "http://host.docker.internal:4566")
 logger.info("Using S3 endpoint: %s", s3_endpoint)
 s3 = boto3.client("s3", endpoint_url=s3_endpoint)
 
