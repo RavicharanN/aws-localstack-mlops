@@ -188,10 +188,10 @@ Let's drop the stuff we know we dont need and are bloating the size of our lambd
 ```
 cd lambda_package
 
-# 2a) Remove ONNX test data and tests 
+# Remove ONNX test data and tests 
 rm -rf onnxruntime/test_data* onnxruntime/*_tests onnxruntime/scripts
 
-# 2b) Clean Python caches
+# Clean Python caches
 find . -name "__pycache__" -exec rm -rf {} +
 find . -name "*.pyc"        -delete
 ```
