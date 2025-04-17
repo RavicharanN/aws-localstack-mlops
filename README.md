@@ -186,7 +186,7 @@ zip -r ../onnx_fn.zip onnx_inference_lambda.py
 cd ..
 ```
 
-### Create lambda attaching the layer 
+### Create a lambda attaching the layer 
 
 ```
 LAYER_ARN=$(awslocal lambda list-layer-versions \
