@@ -152,7 +152,64 @@ An error occurred (RequestEntityTooLargeException) when calling the CreateFuncti
 
 ## Running inference - Lambda (onnx deployment)
 
-TODO
+We will now try deploying the ONNX version as a lighter alternative to Pytorch. Lambda allows us to create persistent "lambda layers" that installs and persists the heavy dependecies needed for our lambda function. 
+
+Note: Pytorch is too heavy even to use a lambda layer so we switch to ONNX. Try it out if you are curious. 
+
+### Package dependencies into a layer
+
+```
+mkdir onnx_layer
+pip install onnxruntime numpy Pillow -t onnx_layer/python
+cd onnx_layer
+zip -r ../onnx_deps_layer.zip python
+cd ..
+```
+
+Publish the layer
+
+```
+awslocal lambda publish-layer-version \
+  --layer-name onnx-deps \
+  --description "ONNX Runtime + NumPy + Pillow" \
+  --zip-file fileb://onnx_deps_layer.zip \
+  --compatible-runtimes python3.11
+```
+
+### Re-package the func code (alone)
+
+```
+mkdir onnx_fn_pkg
+cp onnx_inference_lambda.py onnx_fn_pkg/
+cd onnx_fn_pkg
+zip -r ../onnx_fn.zip onnx_inference_lambda.py
+cd ..
+```
+
+Create a lambda attaching the layer 
+
+```
+LAYER_ARN=$(awslocal lambda list-layer-versions \
+  --layer-name onnx-deps \
+  --query 'LayerVersions[0].LayerVersionArn' \
+  --output text)
+
+awslocal lambda create-function \
+  --function-name onnx_inference_lambda \
+  --runtime python3.11 \
+  --handler onnx_inference_lambda.lambda_handler \
+  --memory-size 512 \
+  --timeout 30 \
+  --zip-file fileb://onnx_fn.zip \
+  --role arn:aws:iam::000000000000:role/lambda-role \
+  --layers "${LAYER_ARN}" \
+  --environment Variables="{
+    LOCALSTACK_ENDPOINT_URL=http://host.docker.internal:4566,
+    MODEL_S3_PATH=s3://food11-classifier/food11.onnx,
+    DYNAMODB_TABLE=InferenceResults
+  }"
+```
+Now our function code will be under the 50 MB limit, and all heavy dependencies are provided via the layer.
 
 ### Map Lambda to kinesis
 
