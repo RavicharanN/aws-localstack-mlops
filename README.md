@@ -229,7 +229,7 @@ Now lets push a dummy event to kinesis to see if the trigger is working as expec
 echo -n "s3://test-images/your_image.jpg" | base64
 ```
 
-Copy the result of this base64 to your clipboard then run:
+Copy the result of this base64 to your clipboard then run: (Repalce the `--data "<base64>"` with the base64 of your image)
 
 ```
 awslocal kinesis put-record \
