@@ -246,3 +246,5 @@ The docker logs should show if the lambda trigger is working as expected when an
 2025-04-09T16:36:20.877  INFO --- [et.reactor-2] localstack.request.http    : POST /_localstack_lambda/f0551557c97966a9bf4b5f1b62b29653/invocations/20d3ddc4-4dd4-434c-9b6c-9494a26a5dd8/logs => 202
 2025-04-09T16:36:20.879  INFO --- [et.reactor-0] localstack.request.http    : POST /_localstack_lambda/f0551557c97966a9bf4b5f1b62b29653/invocations/20d3ddc4-4dd4-434c-9b6c-9494a26a5dd8/response => 202
 ```
+
+The latest entries inferred by Lambda will show up in the DynamoDB 
