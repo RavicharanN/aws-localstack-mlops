@@ -154,7 +154,7 @@ An error occurred (RequestEntityTooLargeException) when calling the CreateFuncti
 
 We will now try deploying the ONNX version as a lighter alternative to Pytorch. Lambda allows us to create persistent "lambda layers" that installs and persists the heavy dependecies needed for our lambda function. 
 
-Note: Pytorch is too heavy even to use a lambda layer so we switch to ONNX. Try it out if you are curious. 
+**Note:** Pytorch is too heavy even to use a lambda layer so we switch to ONNX. Try it out if you are curious. 
 
 ### Package dependencies into a layer
 
