@@ -217,7 +217,7 @@ Now that we setup our lambda trigger, we need to map it to our kinesis stream. C
 
 ```
 awslocal lambda create-event-source-mapping \
-  --function-name food11-trigger-lambda \
+  --function-name onnx_inference_lambda \
   --batch-size 1 \
   --starting-position LATEST \
   --event-source-arn arn:aws:kinesis:us-east-1:000000000000:stream/food11-inference-stream
