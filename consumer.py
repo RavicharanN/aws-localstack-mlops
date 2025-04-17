@@ -14,12 +14,12 @@ logger = logging.getLogger(__name__)
 
 # --- Configuration ---
 # Kinesis configuration
-KINESIS_ENDPOINT = os.environ.get("KINESIS_ENDPOINT_URL", "http://host.docker.internal:4566")
+KINESIS_ENDPOINT = os.environ.get("LOCALSTACK_ENDPOINT_URL", "http://host.docker.internal:4566")
 STREAM_NAME = os.environ.get("KINESIS_STREAM_NAME", "my-kinesis-stream")
 SHARD_ID = os.environ.get("KINESIS_SHARD_ID", "shardId-000000000000")
 
 # DynamoDB configuration
-DYNAMODB_ENDPOINT = os.environ.get("DYNAMODB_ENDPOINT_URL", "http://host.docker.internal:4566")
+DYNAMODB_ENDPOINT = os.environ.get("LOCALSTACK_ENDPOINT_URL", "http://host.docker.internal:4566")
 DYNAMODB_TABLE = os.environ.get("DYNAMODB_TABLE", "InferenceResults")
 
 # --- Clients Initialization ---
