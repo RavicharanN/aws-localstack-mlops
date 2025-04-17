@@ -159,57 +159,70 @@ We will now try deploying the ONNX version as a lighter alternative to Pytorch. 
 ### Package dependencies into a layer
 
 ```
-mkdir onnx_layer
-pip install onnxruntime numpy Pillow -t onnx_layer/python
-cd onnx_layer
-zip -r ../onnx_deps_layer.zip python
+mkdir onnx_lambda
+cp onnx_inference_lambda.py onnx_lambda/
+pip install onnxruntime numpy Pillow -t onnx_lambda/
+```
+
+Zip the lambda for deployment and very if the size is <50 MB (limit for lambda packages)
+
+```
+cd lambda_package
+zip -9 -r ../onnx_inference_lambda.zip .
 cd ..
+ls -lh onnx_inference_lambda.zip
 ```
 
-Publish the layer
+You should see something like
 
 ```
-awslocal lambda publish-layer-version \
-  --layer-name onnx-deps \
-  --description "ONNX Runtime + NumPy + Pillow" \
-  --zip-file fileb://onnx_deps_layer.zip \
-  --compatible-runtimes python3.11
+-rw-rw-r-- 1 cc cc 57M Apr 17 17:17 onnx_inference_lambda.zip
 ```
 
-### Re-package the func code (alone)
+**!!The package is still > 50MB!!**
+
+### Remove unwanted dependencies from our lambda
+
+Let's drop the stuff we know we dont need and are bloating the size of our lambda package
 
 ```
-mkdir onnx_fn_pkg
-cp onnx_inference_lambda.py onnx_fn_pkg/
-cd onnx_fn_pkg
-zip -r ../onnx_fn.zip onnx_inference_lambda.py
+cd lambda_package
+
+# 2a) Remove ONNX test data and tests 
+rm -rf onnxruntime/test_data* onnxruntime/*_tests onnxruntime/scripts
+
+# 2b) Clean Python caches
+find . -name "__pycache__" -exec rm -rf {} +
+find . -name "*.pyc"        -delete
+```
+
+### Zip and verify the size is reduced 
+
+```
+zip -9 -r ../onnx_inference_lambda.zip .
 cd ..
+ls -lh onnx_inference_lambda.zip
 ```
 
-### Create a lambda attaching the layer 
+You should see that the size now reduced to ~ `43MB`
+
+### Create the Lambda function
 
 ```
-LAYER_ARN=$(awslocal lambda list-layer-versions \
-  --layer-name onnx-deps \
-  --query 'LayerVersions[0].LayerVersionArn' \
-  --output text)
-
 awslocal lambda create-function \
   --function-name onnx_inference_lambda \
   --runtime python3.11 \
   --handler onnx_inference_lambda.lambda_handler \
   --memory-size 512 \
   --timeout 30 \
-  --zip-file fileb://onnx_fn.zip \
+  --zip-file fileb://onnx_inference_lambda.zip \
   --role arn:aws:iam::000000000000:role/lambda-role \
-  --layers "${LAYER_ARN}" \
   --environment Variables="{
     LOCALSTACK_ENDPOINT_URL=http://host.docker.internal:4566,
     MODEL_S3_PATH=s3://food11-classifier/food11.onnx,
     DYNAMODB_TABLE=InferenceResults
   }"
 ```
-Now our function code will be under the 50 MB limit, and all heavy dependencies are provided via the layer.
 
 ### Map Lambda to kinesis
 
